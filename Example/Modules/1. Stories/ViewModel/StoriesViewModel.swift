@@ -42,15 +42,16 @@ public final class StoriesViewModel: BaseViewModel {
         
         Task {
             do {
-                let new = try await service.products(nil, state.currentPage).map { Story(id: $0.id, seen: false, product: $0) }
+                let products = try await service.products(nil, state.currentPage)
+                let newStories = products.map { Story(id: $0.id, seen: false, product: $0) }
                 
                 if reset {
-                    state.stories = new
+                    state.stories = newStories
                 } else {
-                    state.stories.append(contentsOf: new)
+                    state.stories.append(contentsOf: newStories)
                 }
                 
-                state.hasMorePages = new.count >= state.currentPage.limit
+                state.hasMorePages = products.count >= state.currentPage.limit
                 
                 if state.hasMorePages {
                     state.currentPage = state.currentPage.next
@@ -59,7 +60,7 @@ public final class StoriesViewModel: BaseViewModel {
                 state.isLoading = false
                 state.isLoadingMore = false
             } catch {
-                state.errorMessage = "Failed to load products"
+                state.errorMessage = "Failed to load stories"
                 state.isLoading = false
                 state.isLoadingMore = false
                 handleError(error)
@@ -80,24 +81,29 @@ public final class StoriesViewModel: BaseViewModel {
         }
     }
     
-    // Mark a story as seen
+    // MARK: - Story Status Management
+    
     func markAsSeen(_ storyId: Int) {
         if let index = state.stories.firstIndex(where: { $0.id == storyId }) {
             state.stories[index].seen = true
         }
     }
     
-    // Mark a story as unseen
     func markAsUnseen(_ storyId: Int) {
         if let index = state.stories.firstIndex(where: { $0.id == storyId }) {
             state.stories[index].seen = false
         }
     }
     
-    // Toggle the seen status of a story
     func toggleSeenStatus(_ storyId: Int) {
         if let index = state.stories.firstIndex(where: { $0.id == storyId }) {
             state.stories[index].seen.toggle()
+        }
+    }
+    
+    func markAllAsUnseen() {
+        for index in state.stories.indices {
+            state.stories[index].seen = false
         }
     }
 }
