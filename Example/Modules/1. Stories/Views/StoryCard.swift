@@ -9,33 +9,51 @@ import SwiftUI
 
 struct StoryCard: View {
     let story: Story
-
+    var onToggleSeen: () -> Void
+    
     @State private var isImageLoaded = false
     
     var body: some View {
         VStack {
-            // Image section
-            AsyncImage(url: URL(string: story.thumbnail ?? "")) { phase in
-                switch phase {
-                case .success(let image):
-                    image
-                        .resizable()
-                        .aspectRatio(contentMode: .fill)
-                        .onAppear { isImageLoaded = true }
-                case .failure:
-                    Image(systemName: "photo")
-                        .font(.system(size: 40))
-                        .foregroundStyle(.secondary)
-                case .empty:
-                    ProgressView()
-                @unknown default:
-                    EmptyView()
+            // Image section with seen/unseen indicator
+            ZStack(alignment: .topTrailing) {
+                AsyncImage(url: URL(string: story.thumbnail ?? "")) { phase in
+                    switch phase {
+                    case .success(let image):
+                        image
+                            .resizable()
+                            .aspectRatio(contentMode: .fill)
+                            .onAppear {
+                                isImageLoaded = true
+                            }
+                    case .failure:
+                        Image(systemName: "photo")
+                            .resizable()
+                            .aspectRatio(contentMode: .fit)
+                            .foregroundStyle(.secondary)
+                            .padding()
+                            .onAppear {
+                                isImageLoaded = true
+                            }
+                    case .empty:
+                        ProgressView()
+                    @unknown default:
+                        EmptyView()
+                    }
                 }
+                .frame(height: 200)
+                .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+                
+                // Seen/unseen indicator
+                Circle()
+                    .fill(story.seen ? Color.gray.opacity(0.7) : Color.blue)
+                    .frame(width: 16, height: 16)
+                    .overlay(
+                        Circle()
+                            .stroke(Color.white, lineWidth: 2)
+                    )
+                    .padding(8)
             }
-            .frame(height: 200)
-            .frame(maxWidth: .infinity)
-            .background(Color(.secondarySystemBackground))
-            .clipShape(RoundedRectangle(cornerRadius: 8))
             
             VStack(alignment: .leading, spacing: 8) {
                 // Category badge
@@ -55,8 +73,7 @@ struct StoryCard: View {
                 }
                 .opacity(isImageLoaded ? 1 : 0)
                 
-                // Price
-                // Price
+                // Price and seen/unseen button
                 HStack {
                     Text("$\(String(format: "%.2f", story.price))")
                         .font(.title2)
@@ -65,16 +82,14 @@ struct StoryCard: View {
                     
                     Spacer()
                     
-                    Button(action: {
-                        // Add to cart functionality
-                    }) {
+                    Button(action: onToggleSeen) {
                         HStack {
-                            Image(systemName: "cart.badge.plus")
-                            Text("Seen")
+                            Image(systemName: story.seen ? "eye.slash" : "eye")
+                            Text(story.seen ? "Mark as Unseen" : "Mark as Seen")
                         }
                         .padding(.horizontal, 16)
                         .padding(.vertical, 8)
-                        .background(Color.blue)
+                        .background(story.seen ? Color.gray : Color.blue)
                         .foregroundStyle(.white)
                         .clipShape(RoundedRectangle(cornerRadius: 8))
                     }
@@ -84,5 +99,6 @@ struct StoryCard: View {
         }
         .cardStyle()
         .animation(.spring(response: 0.3), value: isImageLoaded)
+        .animation(.spring(response: 0.3), value: story.seen)
     }
 } 

@@ -13,6 +13,7 @@ public struct StoriesFeedView: View {
     private let navigator: Navigator<StoriesScreen>
     
     @State private var viewModel: StoriesViewModel
+    @State private var showOnlyUnseen = false
 
     public init(navigator: Navigator<StoriesScreen>, service: PlatziService) {
         self.navigator = navigator
@@ -36,21 +37,34 @@ public struct StoriesFeedView: View {
                 }
             } else {
                 ScrollView {
+                    // Filter toggle
+                    Toggle("Show Only Unseen", isOn: $showOnlyUnseen)
+                        .padding(.horizontal)
+                        .padding(.top)
+                    
                     LazyVGrid(
                         columns: [
                             GridItem(.adaptive(minimum: 300, maximum: 400), spacing: 16)
                         ],
                         spacing: 16
                     ) {
-                        ForEach(viewModel.state.stories) { story in
-                            StoryCard(story: story)
-                                .contentShape(Rectangle())
-                                .onTapGesture {
-                                    withAnimation {
-                                        navigator.push(.item(story.id))
-                                    }
+                        let filteredStories = showOnlyUnseen 
+                            ? viewModel.state.stories.filter { !$0.seen }
+                            : viewModel.state.stories
+                            
+                        ForEach(filteredStories) { story in
+                            StoryCard(story: story, onToggleSeen: {
+                                viewModel.toggleSeenStatus(story.id)
+                            })
+                            .contentShape(Rectangle())
+                            .onTapGesture {
+                                viewModel.markAsSeen(story.id)
+                                
+                                withAnimation {
+                                    navigator.push(.item(story.id))
                                 }
-                                .transition(.scale.combined(with: .opacity))
+                            }
+                            .transition(.scale.combined(with: .opacity))
                         }
                         
                         if !viewModel.state.stories.isEmpty {
@@ -88,6 +102,18 @@ public struct StoriesFeedView: View {
             }
         }
         .navigationTitle("Stories")
+        .toolbar {
+            ToolbarItem(placement: .navigationBarTrailing) {
+                Button(action: {
+                    // Mark all as seen/unseen
+                    for story in viewModel.state.stories {
+                        viewModel.markAsUnseen(story.id)
+                    }
+                }) {
+                    Label("Mark All as Unseen", systemImage: "eye.slash")
+                }
+            }
+        }
         .animation(.spring(response: 0.3), value: viewModel.state.stories)
         .task {
             if viewModel.state.stories.isEmpty {

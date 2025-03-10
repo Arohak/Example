@@ -7,6 +7,7 @@
 
 import Foundation
 import Observation
+import SwiftData
 
 @Observable
 @MainActor
@@ -76,6 +77,27 @@ public final class StoriesViewModel: BaseViewModel {
         await withCheckedContinuation { continuation in
             fetch(reset: true)
             continuation.resume()
+        }
+    }
+    
+    // Mark a story as seen
+    func markAsSeen(_ storyId: Int) {
+        if let index = state.stories.firstIndex(where: { $0.id == storyId }) {
+            state.stories[index].seen = true
+        }
+    }
+    
+    // Mark a story as unseen
+    func markAsUnseen(_ storyId: Int) {
+        if let index = state.stories.firstIndex(where: { $0.id == storyId }) {
+            state.stories[index].seen = false
+        }
+    }
+    
+    // Toggle the seen status of a story
+    func toggleSeenStatus(_ storyId: Int) {
+        if let index = state.stories.firstIndex(where: { $0.id == storyId }) {
+            state.stories[index].seen.toggle()
         }
     }
 }
