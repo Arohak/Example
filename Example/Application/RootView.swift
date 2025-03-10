@@ -10,7 +10,7 @@ import SwiftUI
 extension Screen: CaseIterable, Identifiable {
     public var id: Screen { self }
     
-    public static var allCases = [Screen.stories(.list), .market(.categories), .posts(.list), .settings]
+    public static var allCases = [Screen.stories(.list), .market(.categories), .settings]
     
     var info: (title: String, icon: String) {
         switch self {
