@@ -1,5 +1,5 @@
 //
-//  HomeFeedView.swift
+//  PostFeedView.swift
 //  Example
 //
 //  Created by Ara Hakobyan on 3/9/25.
@@ -8,8 +8,8 @@
 import SwiftUI
 import SwiftData
 
-public struct HomeFeedView: View {
-    @Environment(\.navigator) private var navigator: Navigator<HomeScreen>
+public struct PostFeedView: View {
+    @Environment(\.navigator) private var navigator: Navigator<PostScreen>
     @Environment(\.postService) private var service: PostService
     @Environment(\.modelContext) private var modelContext
     
@@ -63,7 +63,7 @@ public struct HomeFeedView: View {
     }
 }
 
-extension HomeFeedView {
+extension PostFeedView {
     private func fetchPosts() {
         isLoading = true
         errorMessage = nil
@@ -109,6 +109,6 @@ extension HomeFeedView {
 }
 
 #Preview {
-    HomeFeedView()
+    PostFeedView()
         .modelContainer(for: Post.self, inMemory: true)
 }

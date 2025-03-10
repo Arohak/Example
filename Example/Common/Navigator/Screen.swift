@@ -8,12 +8,17 @@
 import SwiftUI
 
 public enum Screen: Hashable, Sendable {
-    case home(HomeScreen)
+    case stories(StoriesScreen)
     case market(MarketScreen)
+    case posts(PostScreen)
     case settings
 }
 
-public enum HomeScreen: Hashable, Sendable {
+public enum StoriesScreen: Hashable, Sendable {
+    case list, item(Int)
+}
+
+public enum PostScreen: Hashable, Sendable {
     case list, item(Int)
 }
 

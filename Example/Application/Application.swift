@@ -15,6 +15,6 @@ struct Application: App {
         WindowGroup {
             RootView()
         }
-        .modelContainer(for: [Post.self, Item.self], inMemory: false)
+        .modelContainer(for: [Story.self, Post.self, Item.self], inMemory: false)
     }
 }

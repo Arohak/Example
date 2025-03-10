@@ -1,5 +1,5 @@
 //
-//  HomeDetailsView.swift
+//  PostDetailsView.swift
 //  Example
 //
 //  Created by Ara Hakobyan on 3/9/25.
@@ -7,10 +7,10 @@
 
 import SwiftUI
 
-public struct HomeDetailsView: View {
+public struct PostDetailsView: View {
     let postId: Int
 
-    @Environment(\.navigator) private var navigator: Navigator<HomeScreen>
+    @Environment(\.navigator) private var navigator: Navigator<PostScreen>
     @Environment(\.postService) private var service: PostService
 
     @State private var post: PostDTO?
@@ -60,7 +60,7 @@ public struct HomeDetailsView: View {
     }
 }
 
-extension HomeDetailsView {
+extension PostDetailsView {
     func fetchPost() {
         post = nil
         
@@ -72,5 +72,5 @@ extension HomeDetailsView {
 }
 
 #Preview {
-    HomeDetailsView(postId: 1)
+    PostDetailsView(postId: 1)
 }
